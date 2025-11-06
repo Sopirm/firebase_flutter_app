@@ -1,16 +1,9 @@
-# firebase_notes_app
+# Firebase Notes App
 
-A new Flutter project.
+Это простое приложение для заметок, созданное с использованием Flutter и Firebase Firestore. Оно позволяет пользователям создавать, просматривать, редактировать и удалять заметки, которые хранятся в облачной базе данных Firestore.
 
-## Getting Started
+## Используемые технологии
 
-This project is a starting point for a Flutter application.
+*   **Flutter**: Фреймворк для создания кроссплатформенных мобильных, веб- и десктопных приложений.
+*   **Firebase Firestore**: Облачная NoSQL база данных для хранения и синхронизации данных в реальном времени.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
