@@ -12,18 +12,43 @@ class _NotesPageState extends State<NotesPage> {
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
 
+  CollectionReference<Map<String, dynamic>> _getNotesCollection() {
+    return _db.collection('notes');
+  }
+
   Future<void> _createNote() async {
     final title = _titleCtrl.text.trim();
     final content = _contentCtrl.text.trim();
-    if (title.isEmpty) return;
+
+    if (title.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заголовок не может быть пустым')),
+        );
+      }
+      return;
+    }
 
     final now = Timestamp.now();
-    await _db.collection('notes').add({
-      'title': title,
-      'content': content,
-      'createdAt': now,
-      'updatedAt': now,
-    });
+    try {
+      await _getNotesCollection().add({
+        'title': title,
+        'content': content,
+        'createdAt': now,
+        'updatedAt': now,
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заметка успешно создана')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка создания заметки: $e')),
+        );
+      }
+    }
 
     _titleCtrl.clear();
     _contentCtrl.clear();
@@ -31,15 +56,50 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   Future<void> _updateNote(DocumentReference ref, String title, String content) async {
-    await ref.update({
-      'title': title,
-      'content': content,
-      'updatedAt': Timestamp.now(),
-    });
+    if (title.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заголовок не может быть пустым')),
+        );
+      }
+      return;
+    }
+
+    try {
+      await ref.update({
+        'title': title,
+        'content': content,
+        'updatedAt': Timestamp.now(),
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заметка успешно обновлена')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка обновления заметки: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _deleteNote(DocumentReference ref) async {
-    await ref.delete();
+    try {
+      await ref.delete();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заметка успешно удалена')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка удаления заметки: $e')),
+        );
+      }
+    }
   }
 
   void _openCreateDialog() {
@@ -94,7 +154,7 @@ class _NotesPageState extends State<NotesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final notesStream = _db.collection('notes').orderBy('createdAt', descending: true).snapshots();
+    final notesStream = _getNotesCollection().orderBy('createdAt', descending: true).snapshots();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Firebase Notes')),
